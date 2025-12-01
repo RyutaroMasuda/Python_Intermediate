@@ -1,4 +1,5 @@
 import ipdb
+import random
 
 class TicTacToe:
     """ This class is for " n in row " game.
@@ -8,10 +9,15 @@ class TicTacToe:
         self.n = n
         self.next = 1
         self.state = 0
+        self.size = n
         self.winner = None
         self.board = [[0 for _ in range(n)] for _ in range(n)]
 
     def play(self, player,x,y):
+        if player != self.next:
+            print("今はプレイヤー", self.next, "の手番です")
+            return
+        
         if self.board[x][y] == 0:
             if player == 1:
                 self.board[x][y] = "〇"
@@ -31,6 +37,7 @@ class TicTacToe:
                     if x  == self.n - 2:
                         self.winner = self.board[x][y]
                         self.state = 2
+                        self.next = None
                         break
                     x+=1
             # 縦方向
@@ -40,6 +47,7 @@ class TicTacToe:
                     if y == self.n - 2:
                         self.winner = self.board[x][y]
                         self.state = 2
+                        self.next = None
                         break
                     y+=1
             # 斜め方向
@@ -49,6 +57,7 @@ class TicTacToe:
                     if x == self.n - 2:
                         self.winner = self.board[x][y]
                         self.state = 2
+                        self.next = None
                         break
                     y+=1
                     x+=1
@@ -82,18 +91,22 @@ if __name__ == "__main__":
     tictactoe = TicTacToe(5)
     while(tictactoe.winner == None):
         tictactoe.print_board()
-        print("x座標は")
-        x = int(input())
-        while(x<0 or x>tictactoe.n):
-            print("もう一度入れなおして\n")
+        if tictactoe.next ==1 :
             print("x座標は")
-            x=int(input())
-        print("y座標は")
-        y = int(input())
-        while(y<0 or y>tictactoe.n):
-            print("もう一度入れなおして\n")
+            x = int(input())
+            while(x<0 or x>tictactoe.n):
+                print("もう一度入れなおして\n")
+                print("x座標は")
+                x=int(input())
             print("y座標は")
-            y=int(input())
+            y = int(input())
+            while(y<0 or y>tictactoe.n):
+                print("もう一度入れなおして\n")
+                print("y座標は")
+                y=int(input())
+        elif tictactoe.next == 2:
+            x = random.randrange(tictactoe.n)
+            y = random.randrange(tictactoe.n)
         tictactoe.play(tictactoe.next,x-1,y-1)
         tictactoe.judgement()
         if(tictactoe.winner == "〇"):
