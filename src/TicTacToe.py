@@ -1,30 +1,87 @@
+import ipdb
 
 class TicTacToe:
-    def __init__(self,n=3,next=1,board,state=0,winner):
+    """ This class is for " n in row " game.
+        First player is represented as  "〇", and Second player is represented as "×".
+    """
+    def __init__(self,n=3):
         self.n = n
-        self.next = next
-        self.state = state
-        for i in range(n):
-            for j in range(n):
-                self.board[i][j] = 0
+        self.next = 1
+        self.state = 0
         self.winner = None
+        self.board = [[0 for _ in range(n)] for _ in range(n)]
 
-    def play(player,x,y):
+    def play(self, player,x,y):
         if self.board[x][y] == 0:
             if player == 1:
                 self.board[x][y] = "〇"
                 self.next = 2
-            else if player == 2:
+            elif player == 2:
                 self.board[x][y] = "×"
                 self.next = 1
         else:
             print("Caution: You can't put the piece here!")
+        
+    def judgement(self):
+        for idx in range(self.n):
+            # 横方向
+            if(idx % self.n == 0):
+                x, y = self.idx2coordinate(idx)
+                while(x + 1 < self.n and self.board[x][y]!=0 and self.board[x][y] == self.board[x+1][y]):
+                    if x  == self.n - 2:
+                        self.winner = self.board[x][y]
+                        break
+                    x+=1
+            # 縦方向
+            if(idx//self.n == 0):
+                x, y = self.idx2coordinate(idx)
+                while(y + 1 < self.n and self.board[x][y]!=0 and self.board[x][y] == self.board[x][y+1]):
+                    if y == self.n - 2:
+                        self.winner = self.board[x][y]
+                        break
+                    y+=1
+            # 斜め方向
+            if(idx==0 or idx == self.n-1):
+                x, y = self.idx2coordinate(idx)
+                while(x+1 <self.n and y+1< self.n and self.board[x][y]!=0 and self.board[x][y] == self.board[x+1][y+1]):
+                    if x == self.n - 2:
+                        self.winner = self.board[x][y]
+                        break
+                    y+=1
+                    x+=1
+    
+    def idx2coordinate(self, idx):
+        x = idx % self.n
+        y = idx // self.n
+        return x,y
 
-    def print_board():
+    def coordinate2idx(self, x,y):
+        idx = y * self.n + x
+        return idx
+
+    def print_board(self):
+        if self.next == 1:
+            print("先行プレイヤの番です\n")
+        elif self.next == 2:
+            print("後攻プレイヤの番です\n")
         for i in range(self.n):
             for j in range(self.n):
-                print(f"|{self.board[i][j]}|")
+                print(f"{self.board[i][j]} ", end ="")
             print("\n")
 
     
-if '__name__' == "__main__":
+if __name__ == "__main__":
+    print("これはn目並べゲームです。\n")
+    tictactoe = TicTacToe(5)
+    while(tictactoe.winner == None):
+        tictactoe.print_board()
+        print("x座標は")
+        x = int(input())
+        print("y座標は")
+        y = int(input())
+        tictactoe.play(tictactoe.next,x,y)
+        tictactoe.judgement()
+        if(tictactoe.winner == "〇"):
+            print("先行の勝利")
+        elif(tictactoe.winner == "×"):
+            print("後攻の勝利")
