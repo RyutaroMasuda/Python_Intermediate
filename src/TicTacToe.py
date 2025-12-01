@@ -30,6 +30,7 @@ class TicTacToe:
                 while(x + 1 < self.n and self.board[x][y]!=0 and self.board[x][y] == self.board[x+1][y]):
                     if x  == self.n - 2:
                         self.winner = self.board[x][y]
+                        self.state = 2
                         break
                     x+=1
             # 縦方向
@@ -38,6 +39,7 @@ class TicTacToe:
                 while(y + 1 < self.n and self.board[x][y]!=0 and self.board[x][y] == self.board[x][y+1]):
                     if y == self.n - 2:
                         self.winner = self.board[x][y]
+                        self.state = 2
                         break
                     y+=1
             # 斜め方向
@@ -46,9 +48,14 @@ class TicTacToe:
                 while(x+1 <self.n and y+1< self.n and self.board[x][y]!=0 and self.board[x][y] == self.board[x+1][y+1]):
                     if x == self.n - 2:
                         self.winner = self.board[x][y]
+                        self.state = 2
                         break
                     y+=1
                     x+=1
+            if all(self.board[i][j] != 0 for i in range(self.n) for j in range(self.n)):
+                self.state = 1   
+                self.next = None
+                self.winner = None
     
     def idx2coordinate(self, idx):
         x = idx % self.n
@@ -77,9 +84,17 @@ if __name__ == "__main__":
         tictactoe.print_board()
         print("x座標は")
         x = int(input())
+        while(x<0 or x>tictactoe.n):
+            print("もう一度入れなおして\n")
+            print("x座標は")
+            x=int(input())
         print("y座標は")
         y = int(input())
-        tictactoe.play(tictactoe.next,x,y)
+        while(y<0 or y>tictactoe.n):
+            print("もう一度入れなおして\n")
+            print("y座標は")
+            y=int(input())
+        tictactoe.play(tictactoe.next,x-1,y-1)
         tictactoe.judgement()
         if(tictactoe.winner == "〇"):
             print("先行の勝利")
