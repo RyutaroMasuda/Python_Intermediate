@@ -1,115 +1,174 @@
-import ipdb
 import random
+from enum import Enum
+
+
+class Player(Enum):
+    FIRST = 1   # 先手
+    SECOND = 2  # 後手
+
+
+class Cell(Enum):
+    EMPTY = 0
+    FIRST = 1   # 〇
+    SECOND = 2  # ×
+
+
+class GameState(Enum):
+    CONTINUE = 0
+    DRAW = 1
+    FINISHED = 2
+
 
 class TicTacToe:
     """ This class is for " n in row " game.
         First player is represented as  "〇", and Second player is represented as "×".
     """
-    def __init__(self,n=3):
-        self.n = n
-        self.next = 1
-        self.state = 0
-        self.size = n
-        self.winner = None
-        self.board = [[0 for _ in range(n)] for _ in range(n)]
 
-    def play(self, player,x,y):
+    def __init__(self, n=3):
+        self.size = n            # 課題仕様の size
+        self.n = n               # こっちを使ってもOK
+        self.next = Player.FIRST # 次のプレイヤー（先手から）
+        self.state = GameState.CONTINUE
+        self.winner = None       # Player or None
+        self.board = [[Cell.EMPTY for _ in range(n)] for _ in range(n)]
+
+    # x: 列(0〜n-1), y: 行(0〜n-1)
+    def play(self, player, x, y):
+        # ゲーム終了後は打てない
+        if self.state != GameState.CONTINUE:
+            print("ゲームはすでに終了しています。")
+            return
+
+        # 手番チェック
         if player != self.next:
             print("今はプレイヤー", self.next, "の手番です")
             return
-        
-        if self.board[x][y] == 0:
-            if player == 1:
-                self.board[x][y] = "〇"
-                self.next = 2
-            elif player == 2:
-                self.board[x][y] = "×"
-                self.next = 1
-        else:
-            print("Caution: You can't put the piece here!")
-        
-    def judgement(self):
-        for idx in range(self.n):
-            # 横方向
-            if(idx % self.n == 0):
-                x, y = self.idx2coordinate(idx)
-                while(x + 1 < self.n and self.board[x][y]!=0 and self.board[x][y] == self.board[x+1][y]):
-                    if x  == self.n - 2:
-                        self.winner = self.board[x][y]
-                        self.state = 2
-                        self.next = None
-                        break
-                    x+=1
-            # 縦方向
-            if(idx//self.n == 0):
-                x, y = self.idx2coordinate(idx)
-                while(y + 1 < self.n and self.board[x][y]!=0 and self.board[x][y] == self.board[x][y+1]):
-                    if y == self.n - 2:
-                        self.winner = self.board[x][y]
-                        self.state = 2
-                        self.next = None
-                        break
-                    y+=1
-            # 斜め方向
-            if(idx==0 or idx == self.n-1):
-                x, y = self.idx2coordinate(idx)
-                while(x+1 <self.n and y+1< self.n and self.board[x][y]!=0 and self.board[x][y] == self.board[x+1][y+1]):
-                    if x == self.n - 2:
-                        self.winner = self.board[x][y]
-                        self.state = 2
-                        self.next = None
-                        break
-                    y+=1
-                    x+=1
-            if all(self.board[i][j] != 0 for i in range(self.n) for j in range(self.n)):
-                self.state = 1   
-                self.next = None
-                self.winner = None
-    
-    def idx2coordinate(self, idx):
-        x = idx % self.n
-        y = idx // self.n
-        return x,y
 
-    def coordinate2idx(self, x,y):
-        idx = y * self.n + x
-        return idx
+        # 範囲チェック
+        if not (0 <= x < self.n and 0 <= y < self.n):
+            print("盤外です")
+            return
+
+        # 空きマスチェック
+        if self.board[y][x] != Cell.EMPTY:
+            print("Caution: You can't put the piece here!")
+            return
+
+        # 石を置く
+        if player == Player.FIRST:
+            self.board[y][x] = Cell.FIRST
+            self.next = Player.SECOND
+        else:
+            self.board[y][x] = Cell.SECOND
+            self.next = Player.FIRST
+
+        # 勝敗・引き分け判定
+        self.judgement()
+
+    def judgement(self):
+        n = self.n
+        b = self.board
+
+        # 横
+        for y in range(n):
+            if b[y][0] != Cell.EMPTY and all(b[y][x] == b[y][0] for x in range(1, n)):
+                self.winner = Player.FIRST if b[y][0] == Cell.FIRST else Player.SECOND
+                self.state = GameState.FINISHED
+                self.next = None
+                return
+
+        # 縦
+        for x in range(n):
+            if b[0][x] != Cell.EMPTY and all(b[y][x] == b[0][x] for y in range(1, n)):
+                self.winner = Player.FIRST if b[0][x] == Cell.FIRST else Player.SECOND
+                self.state = GameState.FINISHED
+                self.next = None
+                return
+
+        # 斜め（左上→右下）
+        if b[0][0] != Cell.EMPTY and all(b[i][i] == b[0][0] for i in range(1, n)):
+            self.winner = Player.FIRST if b[0][0] == Cell.FIRST else Player.SECOND
+            self.state = GameState.FINISHED
+            self.next = None
+            return
+
+        # 斜め（右上→左下）
+        if b[0][n - 1] != Cell.EMPTY and all(b[i][n - 1 - i] == b[0][n - 1] for i in range(1, n)):
+            self.winner = Player.FIRST if b[0][n - 1] == Cell.FIRST else Player.SECOND
+            self.state = GameState.FINISHED
+            self.next = None
+            return
+
+        # 引き分け判定（空きマスなし）
+        if all(b[y][x] != Cell.EMPTY for y in range(n) for x in range(n)):
+            self.state = GameState.DRAW
+            self.next = None
+            self.winner = None
+        else:
+            self.state = GameState.CONTINUE
 
     def print_board(self):
-        if self.next == 1:
+        # 手番表示
+        if self.next == Player.FIRST:
             print("先行プレイヤの番です\n")
-        elif self.next == 2:
+        elif self.next == Player.SECOND:
             print("後攻プレイヤの番です\n")
-        for i in range(self.n):
-            for j in range(self.n):
-                print(f"{self.board[i][j]} ", end ="")
-            print("\n")
 
-    
+        # マスの表示文字を決める
+        def cell_to_char(cell: Cell) -> str:
+            if cell == Cell.EMPTY:
+                return "・"
+            elif cell == Cell.FIRST:
+                return "〇"
+            elif cell == Cell.SECOND:
+                return "×"
+
+        for y in range(self.n):
+            for x in range(self.n):
+                print(cell_to_char(self.board[y][x]), end=" ")
+            print()
+        print()
+
+
 if __name__ == "__main__":
     print("これはn目並べゲームです。\n")
-    tictactoe = TicTacToe(5)
-    while(tictactoe.winner == None):
-        tictactoe.print_board()
-        if tictactoe.next ==1 :
-            print("x座標は")
+    ttt = TicTacToe(5)
+
+    while ttt.state == GameState.CONTINUE:
+        ttt.print_board()
+
+        if ttt.next == Player.FIRST:
+            # 人間（先手）
+            print("x座標は(1〜{})".format(ttt.n))
             x = int(input())
-            while(x<0 or x>tictactoe.n):
-                print("もう一度入れなおして\n")
-                print("x座標は")
-                x=int(input())
-            print("y座標は")
+            while x < 1 or x > ttt.n:
+                print("もう一度入れなおして\nx座標は(1〜{})".format(ttt.n))
+                x = int(input())
+
+            print("y座標は(1〜{})".format(ttt.n))
             y = int(input())
-            while(y<0 or y>tictactoe.n):
-                print("もう一度入れなおして\n")
-                print("y座標は")
-                y=int(input())
-        elif tictactoe.next == 2:
-            x = random.randrange(tictactoe.n)
-            y = random.randrange(tictactoe.n)
-        tictactoe.play(tictactoe.next,x-1,y-1)
-        tictactoe.judgement()
-        if(tictactoe.winner == "〇"):
-            print("先行の勝利")
-        elif(tictactoe.winner == "×"):
-            print("後攻の勝利")
+            while y < 1 or y > ttt.n:
+                print("もう一度入れなおして\ny座標は(1〜{})".format(ttt.n))
+                y = int(input())
+
+            # 入力は1始まりなので -1 して内部座標に
+            ttt.play(Player.FIRST, x - 1, y - 1)
+
+        else:
+            # ランダムCPU（後手）
+            while True:
+                rx = random.randrange(ttt.n)
+                ry = random.randrange(ttt.n)
+                if ttt.board[ry][rx] == Cell.EMPTY:
+                    ttt.play(Player.SECOND, rx, ry)
+                    break
+
+    # 最終盤面と結果
+    ttt.print_board()
+
+    if ttt.state == GameState.DRAW:
+        print("引き分けです")
+    elif ttt.winner == Player.FIRST:
+        print("先行の勝利")
+    elif ttt.winner == Player.SECOND:
+        print("後攻の勝利")
