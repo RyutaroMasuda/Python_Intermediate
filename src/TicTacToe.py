@@ -1,23 +1,5 @@
 import random
-from enum import Enum
-
-
-class Player(Enum):
-    FIRST = 1   # 先手
-    SECOND = 2  # 後手
-
-
-class Cell(Enum):
-    EMPTY = 0
-    FIRST = 1   # 〇
-    SECOND = 2  # ×
-
-
-class GameState(Enum):
-    CONTINUE = 0
-    DRAW = 1
-    FINISHED = 2
-
+from enum_class import Player,Cell,GameState
 
 class TicTacToe:
     """ This class is for " n in row " game.
@@ -26,7 +8,6 @@ class TicTacToe:
 
     def __init__(self, n=3):
         self.size = n            # 課題仕様の size
-        self.n = n               # こっちを使ってもOK
         self.next = Player.FIRST # 次のプレイヤー（先手から）
         self.state = GameState.CONTINUE
         self.winner = None       # Player or None
@@ -45,7 +26,7 @@ class TicTacToe:
             return
 
         # 範囲チェック
-        if not (0 <= x < self.n and 0 <= y < self.n):
+        if not (0 <= x < self.size  and 0 <= y < self.size ):
             print("盤外です")
             return
 
@@ -66,7 +47,7 @@ class TicTacToe:
         self.judgement()
 
     def judgement(self):
-        n = self.n
+        n = self.size 
         b = self.board
 
         # 横
@@ -123,8 +104,8 @@ class TicTacToe:
             elif cell == Cell.SECOND:
                 return "×"
 
-        for y in range(self.n):
-            for x in range(self.n):
+        for y in range(self.size ):
+            for x in range(self.size ):
                 print(cell_to_char(self.board[y][x]), end=" ")
             print()
         print()
@@ -139,16 +120,16 @@ if __name__ == "__main__":
 
         if ttt.next == Player.FIRST:
             # 人間（先手）
-            print("x座標は(1〜{})".format(ttt.n))
+            print("x座標は(1〜{})".format(ttt.size ))
             x = int(input())
-            while x < 1 or x > ttt.n:
-                print("もう一度入れなおして\nx座標は(1〜{})".format(ttt.n))
+            while x < 1 or x > ttt.size :
+                print("もう一度入れなおして\nx座標は(1〜{})".format(ttt.size ))
                 x = int(input())
 
-            print("y座標は(1〜{})".format(ttt.n))
+            print("y座標は(1〜{})".format(ttt.size))
             y = int(input())
-            while y < 1 or y > ttt.n:
-                print("もう一度入れなおして\ny座標は(1〜{})".format(ttt.n))
+            while y < 1 or y > ttt.size:
+                print("もう一度入れなおして\ny座標は(1〜{})".format(ttt.size))
                 y = int(input())
 
             # 入力は1始まりなので -1 して内部座標に
@@ -157,8 +138,8 @@ if __name__ == "__main__":
         else:
             # ランダムCPU（後手）
             while True:
-                rx = random.randrange(ttt.n)
-                ry = random.randrange(ttt.n)
+                rx = random.randrange(ttt.size)
+                ry = random.randrange(ttt.size)
                 if ttt.board[ry][rx] == Cell.EMPTY:
                     ttt.play(Player.SECOND, rx, ry)
                     break
