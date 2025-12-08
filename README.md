@@ -1,34 +1,37 @@
 リポジトリ: 
 git@github.com:RyutaroMasuda/Python_Intermediate.git
 
-### Random VS Randomの対戦結果
+### Result of Random VS Random
 
-試行回数1000回
+num of attempts: 1000
 
-①先攻後攻固定
-| 先行 | 後攻 | 引き分け |
+① Fixed First/Second Player
+| First | Second | Draw |
 | :----: | :---: | :----: |
 | 621  | 237  | 142 |
 
-②先攻が勝ったら高校になるルール
+② First becomes Second if First wins
 
 | First win | Second win | draw |
 | :---: | :---: | :---: |
 |    200    |    192     | 608  |
 
-### 実装
-ランダムエージェントVS人間
+### implementation
+random agent vs human
 ```
 python human_vs_random.py
 ```
-ランダムエージェントVSランダムエージェント
+random agent vs random agent
 ```
 python random_vs_random.py
 ```
 
 - enum_class.py
-    - enumをまとめている
+    - settle enum
+    - Player, Cell, GameState
 - TicTacToe.py
-    - 試合の実装
+    - implementation of the game
 - agent.py
-    - agentの実装
+    - implementation of agent
+    - random agent
+    - human agent
