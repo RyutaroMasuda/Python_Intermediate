@@ -1,3 +1,6 @@
+リポジトリ: 
+git@github.com:RyutaroMasuda/Python_Intermediate.git
+
 ### Random VS Randomの対戦結果
 
 試行回数1000回
@@ -12,3 +15,20 @@
 | First win | Second win | draw |
 | :---: | :---: | :---: |
 |    200    |    192     | 608  |
+
+### 実装
+ランダムエージェントVS人間
+```
+python human_vs_random.py
+```
+ランダムエージェントVSランダムエージェント
+```
+python random_vs_random.py
+```
+
+- enum_class.py
+    - enumをまとめている
+- TicTacToe.py
+    - 試合の実装
+- agent.py
+    - agentの実装
