@@ -1,7 +1,7 @@
 リポジトリ: 
 git@github.com:RyutaroMasuda/Python_Intermediate.git
 
-### Result of Random VS Q_agent
+### Result of Random VS Q_agent(n=3)
 
 ① Fixed First:random Second:q_agent
 num of attempts : 1000000
@@ -20,7 +20,7 @@ num of attempts : 100000
 | Q_learning | Random | Draw |
 | :----: | :---: | :----: |
 | 53609  | 41185  | 5206 |
-### Result of Random VS Random
+### Result of Random VS Random(n=5)
 
 num of attempts: 1000
 
