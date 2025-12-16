@@ -10,51 +10,73 @@ if __name__ == "__main__":
     PlayerA_state = "First"
     num_q_win = 0
 
+    dummy_game = TicTacToe(4)
+    q_agent = QLearningAgent(Player.FIRST,dummy_game)
+
     for i in range(100000):
         print(f"これは{i}試合目のn目並べゲームです。\n")
-        ttt = TicTacToe(3)
+        ttt = TicTacToe(5)
 
-        if PlayerA_state == "First":
-            q_player = Player.FIRST
-            r_player = Player.SECOND
-        else:
-            q_player = Player.SECOND
-            r_player = Player.FIRST
+        # if PlayerA_state == "First":
+        #     q_player = Player.FIRST
+        #     r_player = Player.SECOND
+        # else:
+        #     q_player = Player.SECOND
+        #     r_player = Player.FIRST
+        q_player = Player.FIRST
+        r_player = Player.SECOND
 
-        q_agent = QLearningAgent(Player.FIRST, ttt)
         r_agent = RandomAgent(r_player)
 
+        s = None
+        a = None
         while ttt.state == GameState.CONTINUE:
             ttt.print_board()
-
+            # ------- Qのターン -------
             if ttt.next == q_player:
-                # Player_SECOND
                 s = q_agent.encode_state(ttt.board)
                 a = q_agent.select_action(ttt)
 
-                x,y = q_agent.select_action(ttt)
-                
+                x,y = a
                 ttt.play(q_player, x, y)
 
-                ns = q_agent.encode_state(ttt.board)
+                if ttt.state != GameState.CONTINUE:
+                    ns = q_agent.encode_state(ttt.board)
+                    done = True
 
-                done = (ttt.state != GameState.CONTINUE)
+                    if ttt.state == GameState.FINISHED and ttt.winner == q_player:
+                        reward = +1
+                    elif ttt.state == GameState.FINISHED:
+                        reward = -1
+                    else:
+                        reward = 0
 
-                if ttt.state == GameState.FINISHED and ttt.winner == q_player:
-                    reward = +1
-                elif ttt.state == GameState.FINISHED and ttt.winner != q_player:
-                    reward = -1
-                elif ttt.state == GameState.DRAW:
-                    reward = 0
-                else:
-                    reward = 0
-
-                q_agent.bellman_update(s, a, reward, ns, done)
+                    q_agent.bellman_update(s, a, reward, ns, done)
+                    s = None
+                    a = None
 
             else:
-                # Player_FIRST
+                # ------- Randomのターン -------
                 x,y = r_agent.select_action(ttt)
                 ttt.play(r_player, x, y)
+
+                if s is not None:
+                    ns = q_agent.encode_state(ttt.board)
+                    done = (ttt.state != GameState.CONTINUE)
+
+                    if ttt.state == GameState.FINISHED and ttt.winner == q_player:
+                        reward = +1
+                    elif ttt.state == GameState.FINISHED:
+                        reward = -1
+                    elif ttt.state == GameState.DRAW:
+                        reward = 0
+                    else:
+                        reward = 0
+
+                    q_agent.bellman_update(s, a, reward, ns, done)
+                    s = None
+                    a = None
+
         # 最終盤面と結果
         ttt.print_board()
 
