@@ -109,7 +109,9 @@ class TicTacToe:
                 print(cell_to_char(self.board[y][x]), end=" ")
             print()
         print()
-
+    
+    def count_pattern_brute(self):
+        pass
 
 if __name__ == "__main__":
     print("これはn目並べゲームです。\n")

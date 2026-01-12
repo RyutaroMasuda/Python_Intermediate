@@ -10,12 +10,12 @@ if __name__ == "__main__":
     PlayerA_state = "First"
     num_q_win = 0
 
-    dummy_game = TicTacToe(4)
+    dummy_game = TicTacToe(8)
     q_agent = QLearningAgent(Player.FIRST,dummy_game)
 
     for i in range(100000):
         print(f"これは{i}試合目のn目並べゲームです。\n")
-        ttt = TicTacToe(5)
+        ttt = TicTacToe(8)
 
         # if PlayerA_state == "First":
         #     q_player = Player.FIRST
